@@ -46,6 +46,20 @@ def calculate_compression_percentage(U, S, Vt, k):
 
     return ((compressed_size / original_size)) * 100
 
+def get_log_spaced_values(length):
+    # Generate 8 log-spaced values between 1 and length
+    log_spaced_values = np.logspace(0, np.log10(length), 8, dtype=int)
+    
+    # Ensure unique values and sort them
+    log_spaced_values = np.unique(log_spaced_values)
+    
+    # If necessary, adjust to ensure exactly 8 unique values
+    while len(log_spaced_values) < 8:
+        additional_values = np.linspace(1, length, 8 - len(log_spaced_values), dtype=int)
+        log_spaced_values = np.unique(np.concatenate((log_spaced_values, additional_values)))
+    
+    return log_spaced_values.tolist()
+
 def load_image(image_path):
     # Load the image using Pillow and convert to RGB
     pil_image = Image.open(image_path).convert('RGB')
@@ -65,7 +79,8 @@ if __name__ == "__main__":
         S.append(s)
         Vt.append(vt)
 
-    k_values = np.linspace(0, 50, 7, dtype=int)
+    #k_values = np.linspace(0, 50, 7, dtype=int)
+    k_values = get_log_spaced_values (len(S[0]))
     
     # Reconstruct with different k
     compressed_images = [reconstruct_image(U, S, Vt, k) for k in k_values]
